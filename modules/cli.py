@@ -9,7 +9,7 @@ def cli():
 
 
 @cli.command(name="init")
-@click.option("--file", "-f", type=click.File("r"))
+@click.option("--file", "-f", type=str, required=True)
 def init(file):
     db = Database("birthday_info", "db", "birthday_info")
     db.init(file)

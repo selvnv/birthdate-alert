@@ -1,6 +1,8 @@
 .idea
 .venv
 .env/*
+*.egg-info
 db/*
+__pycache__
 
 !.gitkeep
