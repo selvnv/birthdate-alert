@@ -1,6 +1,7 @@
 import click
 
 from modules.db import Database
+from modules.utils import print_table_paged
 
 
 @click.group()
@@ -32,7 +33,7 @@ def lst():
     db = Database("birthday_info", "db", "birthday_info")
     try:
         result = db.fetch_all()
-        print(result)
+        print_table_paged(result, headers=["Name", "Birthdate", "Additional Info"])
     except Exception as error:
         print(f"\033[1m\033[93m[ERROR] >>>>\033[0m Error while list", error)
 
