@@ -1,0 +1,19 @@
+[project]
+name = "birthday-alert"
+version = "0.1.0"
+description = "Birthday alert manager"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "click>=8.3.3",
+]
+
+[project.scripts]
+birth = "modules.cli:cli"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["modules"]
