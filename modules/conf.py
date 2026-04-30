@@ -7,6 +7,11 @@ class App:
         self._db_path = None
         self._schema_path = None
 
+        self._telegram_token = None
+        self._telegram_chat_id = None
+
+        self._alert_template_path = None
+
         self._load_settings_from_file(self._config_path)
 
 
@@ -35,6 +40,20 @@ class App:
         return self._schema_path
 
 
+    @property
+    def alert_template_path(self):
+        return self._alert_template_path
+
+
+    @property
+    def telegram_token(self):
+        return self._telegram_token
+
+    @property
+    def telegram_chat_id(self):
+        return self._telegram_chat_id
+
+
     def _load_settings_from_file(self, path: Path) -> None:
 
         if path.suffix.lower() not in [".yaml", ".yml"]:
@@ -58,6 +77,11 @@ class App:
 
                 self._db_path = config["sqlite"]["db_path"]
                 self._schema_path = config["sqlite"]["schema_path"]
+
+                self._telegram_token = config["telegram"]["token"]
+                self._telegram_chat_id = config["telegram"]["chat_id"]
+
+                self._alert_template_path = config["app"]["notification_template"]
         except yaml.YAMLError as error:
             raise Exception(f"\033[1m\033[91m[WARN]\033[0m Invalid YAML syntax in {path}: {error}")
         except Exception as error:
