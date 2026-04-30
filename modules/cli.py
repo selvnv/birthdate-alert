@@ -34,7 +34,6 @@ def add(name, birthdate, additional):
 def lst():
     app = App("conf/app.yaml")
     db = Database(app.db_path)
-
     try:
         result = db.fetch_all()
         print_table_paged(result, headers=["Id", "Name", "Birthdate", "Additional Info"])
