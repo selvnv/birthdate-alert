@@ -1,5 +1,6 @@
 import click
 
+from modules.conf import App
 from modules.db import Database
 from modules.utils import print_table_paged
 
@@ -10,10 +11,10 @@ def cli():
 
 
 @cli.command(name="init")
-@click.option("--file", "-f", type=str, required=True)
-def init(file):
-    db = Database("birthday_info", "db", "birthday_info")
-    db.init(file)
+def init():
+    app = App("conf/app.yaml")
+    db = Database(app.db_path)
+    db.init(app.schema_path)
 
 
 @cli.command(name="add")
@@ -21,7 +22,8 @@ def init(file):
 @click.option("--birthdate", "-b", type=click.DateTime(formats=["%Y-%m-%d"]), required=True)
 @click.option("--additional", "-a", type=str, required=False, default=None)
 def add(name, birthdate, additional):
-    db = Database("birthday_info", "db", "birthday_info")
+    app = App("conf/app.yaml")
+    db = Database(app.db_path)
     try:
         db.add(name, birthdate, additional)
     except Exception as error:
@@ -30,14 +32,23 @@ def add(name, birthdate, additional):
 
 @cli.command(name="list")
 def lst():
-    db = Database("birthday_info", "db", "birthday_info")
+    app = App("conf/app.yaml")
+    db = Database(app.db_path)
+
     try:
         result = db.fetch_all()
-        print_table_paged(result, headers=["Name", "Birthdate", "Additional Info"])
+        print_table_paged(result, headers=["Id", "Name", "Birthdate", "Additional Info"])
     except Exception as error:
         print(f"\033[1m\033[93m[ERROR] >>>>\033[0m Error while list", error)
 
 
 @cli.command(name="delete")
-def remove():
-    pass
+@click.argument("record_id", type=int, required=True)
+def remove(record_id):
+    app = App("conf/app.yaml")
+    db = Database(app.db_path)
+    try:
+        result = db.remove(record_id)
+        print_table_paged(result, headers=["Id", "Name", "Birthdate", "Additional Info"])
+    except Exception as error:
+        print(f"\033[1m\033[93m[ERROR] >>>>\033[0m Error while delete", error)

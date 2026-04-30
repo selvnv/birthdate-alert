@@ -1,8 +1,11 @@
 .idea
 .venv
-.env/*
+
+# Артефакты сборки
 *.egg-info
-db/*
 __pycache__
+
+db/*
+conf/*
 
 !.gitkeep
