@@ -17,4 +17,7 @@ def send_telegram_birth_alert(text: str):
     response = requests.post(telegram_request_url, json=payload)
     result = response.json()
 
-    log.info(f"Response from {telegram_request_url}: {result}")
+    if result["ok"]:
+        log.info(f"Response from {telegram_request_url}: {result}")
+    else:
+        log.error(f"Response from {telegram_request_url}: {result}")

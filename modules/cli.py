@@ -65,16 +65,42 @@ def remove(record_id):
         log.error(f"Error while delete", error)
 
 
+@cli.command(name="today")
+def today():
+    log.info(f"Call today")
+
+    app = App("conf/app.yaml")
+    db = Database(app.db_path)
+
+    try:
+        result = db.get_today_births()
+        print_table_paged(result, headers=["Id", "Name", "Birthdate", "Additional Info"])
+    except Exception as error:
+        print(f"\033[1m\033[93m[ERROR] >>>>\033[0m Error while show today births", error)
+        log.error(f"Error while show today births", error)
+
+
 @cli.command(name="alert")
 def alert():
     log.info(f"Call alert")
 
     app = App("conf/app.yaml")
-    message_html = render_birth_notification(
-        template_path=app.alert_template_path,
-        name="Анна",
-        birthdate="01-01-2001",
-        additional_info="Любит цветы и кофе"
-    )
+    db = Database(app.db_path)
 
-    send_telegram_birth_alert(message_html)
+    try:
+        result = db.get_today_births()
+        for record in result:
+            name, birthdate, additional_info = record
+            print(name, birthdate, additional_info)
+
+            message_html = render_birth_notification(
+                template_path=app.alert_template_path,
+                name=name,
+                birthdate=birthdate,
+                additional_info=additional_info or "Ничо не написали=("
+            )
+
+            send_telegram_birth_alert(message_html)
+    except Exception as error:
+        print(f"\033[1m\033[93m[ERROR] >>>>\033[0m Error while alert today births", error)
+        log.error(f"Error while alert today births", error)
