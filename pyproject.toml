@@ -1,6 +1,6 @@
 [project]
 name = "birthday-alert"
-version = "0.1.0"
+version = "0.2.0"
 description = "Birthday alert manager"
 readme = "README.md"
 requires-python = ">=3.12"
