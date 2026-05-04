@@ -18,9 +18,12 @@ class App:
     def __repr__(self) -> str:
         return (
             f"App("
-            f"config_path: {self.config_path}, "
-            f"db_path: {self.db_path}"
-            f"schema_path: {self.schema_path}"
+            f"config_path={self.config_path}, "
+            f"db_path={self.db_path}, "
+            f"schema_path={self.schema_path}, "
+            f"telegram_token={self.telegram_token}, "
+            f"telegram_chat_id={self.telegram_chat_id}, "
+            f"template_path={self.alert_template_path}"
             f")"
         )
 
@@ -57,23 +60,29 @@ class App:
     def _load_settings_from_file(self, path: Path) -> None:
 
         if path.suffix.lower() not in [".yaml", ".yml"]:
-            raise Exception(f"\033[1m\033[91m[WARN]\033[0m App config must be .yaml/.yml format")
+            raise Exception(f"App config must be .yaml/.yml format")
 
         if not path.exists():
-            raise Exception(f"\033[1m\033[91m[WARN]\033[0m Wrong app config file path")
+            raise Exception(f"Wrong app config file path")
 
         if not path.is_file():
-            raise Exception(f"\033[1m\033[91m[WARN]\033[0m Config path is not a file")
+            raise Exception(f"Config path is not a file")
 
         try:
             with path.open("r", encoding="utf-8") as f:
                 config = yaml.safe_load(f)
 
                 if config is None:
-                    raise Exception(f"\033[1m\033[91m[WARN]\033[0m Config file is empty: {path}")
+                    raise Exception(f"Config file is empty: {path}")
 
                 if "sqlite" not in config:
-                    raise Exception(f"\033[1m\033[91m[WARN]\033[0m Missing 'sqlite' section in config")
+                    raise Exception(f"Missing 'sqlite' section in config")
+
+                if "telegram" not in config:
+                    raise Exception(f"Missing 'telegram' section in config")
+
+                if "app" not in config:
+                    raise Exception(f"Missing 'app' section in config")
 
                 self._db_path = config["sqlite"]["db_path"]
                 self._schema_path = config["sqlite"]["schema_path"]
@@ -83,6 +92,6 @@ class App:
 
                 self._alert_template_path = config["app"]["notification_template"]
         except yaml.YAMLError as error:
-            raise Exception(f"\033[1m\033[91m[WARN]\033[0m Invalid YAML syntax in {path}: {error}")
+            raise Exception(f"\033[1m\033[93m[WARN]\033[0m  Invalid YAML syntax in {path}: {error}")
         except Exception as error:
-            raise Exception(f"\033[1m\033[91m[WARN]\033[0m Unexpected error reading config: {error}")
+            raise Exception(f"\033[1m\033[93m[WARN]\033[0m  Unexpected error while reading config: {error}")

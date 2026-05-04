@@ -32,8 +32,8 @@ def add(name, birthdate, additional):
     try:
         db.add(name, birthdate, additional)
     except Exception as error:
-        print(f"\033[1m\033[93m[ERROR] >>>>\033[0m Error while add", error)
-        log.error(f"Error while add", error)
+        print(f"\033[1m\033[91m[ERROR] >>>>\033[0m Error while add", error)
+        log.error(f"Error while add: {error}")
 
 
 @cli.command(name="list")
@@ -46,8 +46,8 @@ def lst():
         result = db.fetch_all()
         print_table_paged(result, headers=["Id", "Name", "Birthdate", "Additional Info"])
     except Exception as error:
-        print(f"\033[1m\033[93m[ERROR] >>>>\033[0m Error while list", error)
-        log.error(f"Error while list", error)
+        print(f"\033[1m\033[91m[ERROR] >>>>\033[0m Error while list", error)
+        log.error(f"Error while list: {error}")
 
 
 @cli.command(name="delete")
@@ -58,11 +58,11 @@ def remove(record_id):
     app = App("conf/app.yaml")
     db = Database(app.db_path)
     try:
-        result = db.remove(record_id)
-        print_table_paged(result, headers=["Id", "Name", "Birthdate", "Additional Info"])
+        deleted_record_id = db.remove(record_id)
+        print(f"\033[1m\033[94m[INFO] >>>>\033[0m Record with id {deleted_record_id} was deleted")
     except Exception as error:
-        print(f"\033[1m\033[93m[ERROR] >>>>\033[0m Error while delete", error)
-        log.error(f"Error while delete", error)
+        print(f"\033[1m\033[91m[ERROR] >>>>\033[0m Error while delete", error)
+        log.error(f"Error while delete: {error}")
 
 
 @cli.command(name="today")
@@ -76,8 +76,8 @@ def today():
         result = db.get_today_births()
         print_table_paged(result, headers=["Id", "Name", "Birthdate", "Additional Info"])
     except Exception as error:
-        print(f"\033[1m\033[93m[ERROR] >>>>\033[0m Error while show today births", error)
-        log.error(f"Error while show today births", error)
+        print(f"\033[1m\033[91m[ERROR] >>>>\033[0m Error while show today births", error)
+        log.error(f"Error while show today births: {error}")
 
 
 @cli.command(name="alert")
@@ -89,9 +89,9 @@ def alert():
 
     try:
         result = db.get_today_births()
+        print_table_paged(result, headers=["Id", "Name", "Birthdate", "Additional Info"])
         for record in result:
-            name, birthdate, additional_info = record
-            print(name, birthdate, additional_info)
+            _, name, birthdate, additional_info = record
 
             message_html = render_birth_notification(
                 template_path=app.alert_template_path,
@@ -100,7 +100,7 @@ def alert():
                 additional_info=additional_info or "Ничо не написали=("
             )
 
-            send_telegram_birth_alert(message_html)
+            send_telegram_birth_alert(message_html, app.telegram_token, app.telegram_chat_id)
     except Exception as error:
-        print(f"\033[1m\033[93m[ERROR] >>>>\033[0m Error while alert today births", error)
-        log.error(f"Error while alert today births", error)
+        print(f"\033[1m\033[91m[ERROR] >>>>\033[0m Error while alert today births", error)
+        log.error(f"Error while alert today births: {error}")

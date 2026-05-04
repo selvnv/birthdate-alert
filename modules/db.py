@@ -8,13 +8,13 @@ from modules.logger import log
 
 class Database:
 
-    def __init__(self, db_path: str = "",):
+    def __init__(self, db_path: str = ""):
         self._db_path = db_path
 
 
     def __repr__(self):
         return (
-            f"Database({self.db_path})\n)"
+            f"Database(db_path={self.db_path})"
         )
 
 
@@ -34,7 +34,7 @@ class Database:
             return True
 
         except Exception as error:
-            log.warn(f"\033[1m\033[91m[WARN]\033[0m Healthcheck failed", error)
+            log.warning(f"\033[1m\033[93m[WARN]\033[0m Healthcheck failed with error: {error}")
             return False
 
 
@@ -49,7 +49,7 @@ class Database:
                     cursor = conn.cursor()
                     cursor.execute(query)
         else:
-            log.error(f"\033[1m\033[91m[WARN]\033[0m Wrong init sql file path {initial_sql_file}")
+            log.error(f"\033[1m\033[93m[WARN]\033[0m Wrong init sql file path {initial_sql_file}")
             raise ValueError(f"Wrong file path {initial_sql_file}")
 
 
@@ -68,7 +68,7 @@ class Database:
                 # Return new item id
                 return cursor.fetchone()[0]
         except Exception as error:
-            log.error(f"\033[1m\033[91m[WARN]\033[0m Database add operation error: {error}")
+            log.error(f"\033[1m\033[93m[WARN]\033[0m Database add operation error: {error}")
             raise error
 
 
@@ -78,9 +78,9 @@ class Database:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
                 query = f"""
-                DELETE FROM birthday_info
-                WHERE id = ?
-                RETURNING id;
+                    DELETE FROM birthday_info
+                    WHERE id = ?
+                    RETURNING id;
                 """
 
                 log.info(f"Run query {query} with params {record_id}")
@@ -89,7 +89,7 @@ class Database:
                 # Return deleted item id
                 return cursor.fetchone()[0]
         except Exception as error:
-            log.error(f"\033[1m\033[91m[WARN]\033[0m Database delete operation error: {error}")
+            log.error(f"\033[1m\033[93m[WARN]\033[0m Database delete operation error: {error}")
             raise error
 
 
@@ -98,14 +98,17 @@ class Database:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
 
-                query = f"SELECT * FROM birthday_info"
+                query = f"""
+                    SELECT id, name, birthdate, additional_info 
+                    FROM birthday_info
+                """
                 log.info(f"Run query {query}")
                 cursor.execute(query)
 
                 result = cursor.fetchall()
                 return result
         except Exception as error:
-            log.error(f"\033[1m\033[91m[WARN]\033[0m Database fetch all operation error: {error}")
+            log.error(f"\033[1m\033[93m[WARN]\033[0m Database fetch all operation error: {error}")
             raise error
 
 
@@ -117,7 +120,7 @@ class Database:
 
                 today = datetime.today()
                 query = f"""
-                    SELECT name, birthdate, additional_info
+                    SELECT id, name, birthdate, additional_info
                     FROM birthday_info
                     WHERE birthdate LIKE ?
                 """
@@ -127,5 +130,5 @@ class Database:
 
                 return cursor.fetchall()
         except Exception as error:
-            log.error(f"\033[1m\033[91m[WARN]\033[0m Database get today births operation error: {error}")
+            log.error(f"\033[1m\033[93m[WARN]\033[0m Database get today births operation error: {error}")
             raise error

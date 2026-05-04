@@ -5,6 +5,10 @@ from tabulate import tabulate
 def print_table_paged(row_data,
                          headers: list,
                          page_size: int = 8):
+    if not row_data:
+        print(f"\033[1m\033[94m[INFO] >>>>\033[0m No data to display")
+        return
+
     total_rows = len(row_data)
     total_pages = ceil(total_rows / page_size)
 
